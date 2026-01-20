@@ -1,5 +1,5 @@
 import 'package:caco_flutter_blog/core/error/failure.dart';
-import 'package:caco_flutter_blog/features/auth/domain/entities/user.dart';
+import 'package:caco_flutter_blog/core/common/entities/user.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract interface class AuthRepository {

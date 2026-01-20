@@ -71,7 +71,9 @@ class AuthSupabaseSourceImpl implements AuthSupabaseSource {
         'id', 
         currentSession!.user.id
         );
-        return UserModel.fromJson(userData.first);
+        return UserModel.fromJson(userData.first).copyWith(
+          email: currentSession!.user.email,
+        );
       }
       return null;
     } catch (e) {

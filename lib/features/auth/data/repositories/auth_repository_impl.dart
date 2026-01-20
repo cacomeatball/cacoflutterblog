@@ -1,7 +1,7 @@
 import 'package:caco_flutter_blog/core/error/exception.dart';
 import 'package:caco_flutter_blog/core/error/failure.dart';
 import 'package:caco_flutter_blog/features/auth/data/datasources/auth_supabase_source.dart';
-import 'package:caco_flutter_blog/features/auth/domain/entities/user.dart';
+import 'package:caco_flutter_blog/core/common/entities/user.dart';
 import 'package:caco_flutter_blog/features/auth/domain/repository/auth_repository.dart';
 import 'package:fpdart/src/either.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;

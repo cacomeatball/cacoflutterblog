@@ -1,4 +1,4 @@
-import 'package:caco_flutter_blog/features/auth/domain/entities/user.dart';
+import 'package:caco_flutter_blog/core/common/entities/user.dart';
 
 class UserModel extends User {
   UserModel({
@@ -11,6 +11,17 @@ class UserModel extends User {
       id: json['id'] ?? '',
       email: json['email'] ?? '',
       username: json['username'] ?? '',
+    );
+  }
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? username,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      username: username ?? this.username,
     );
   }
 }

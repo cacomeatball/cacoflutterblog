@@ -1,3 +1,4 @@
+import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:caco_flutter_blog/core/secrets/supabaseEnv.dart';
 import 'package:caco_flutter_blog/features/auth/data/datasources/auth_supabase_source.dart';
 import 'package:caco_flutter_blog/features/auth/data/repositories/auth_repository_impl.dart';
@@ -18,6 +19,8 @@ Future<void> initDependencies() async {
     anonKey: SupabaseEnv.supabaseKey,
   );
   serviceLocator.registerLazySingleton(() => supabase.client);
+
+  serviceLocator.registerLazySingleton(() => AppUserCubit());
 }
 
 void _initAuth() {
@@ -52,6 +55,7 @@ void _initAuth() {
       userSignUp: serviceLocator(),
       userLogIn: serviceLocator(),
       currentUser: serviceLocator(),
+      appUserCubit: serviceLocator(),
     ),
   );
 }
