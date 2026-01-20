@@ -11,6 +11,19 @@ class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this.authSupabaseSource);
 
   @override
+  Future<Either<Failure, User>> currentUser() async {
+    try {
+      final user = await authSupabaseSource.getCurrentUser();
+      if (user == null) {
+        return Left(Failure('No user logged in'));
+      }
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(Failure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, User>> loginWithEmailAndPassword({
     required String email, 
     required String password
@@ -51,4 +64,5 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(Failure(e.message));
     }
   }
+  
 }

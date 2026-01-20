@@ -2,6 +2,7 @@ import 'package:caco_flutter_blog/core/secrets/supabaseEnv.dart';
 import 'package:caco_flutter_blog/features/auth/data/datasources/auth_supabase_source.dart';
 import 'package:caco_flutter_blog/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:caco_flutter_blog/features/auth/domain/repository/auth_repository.dart';
+import 'package:caco_flutter_blog/features/auth/domain/usecases/current_user.dart';
 import 'package:caco_flutter_blog/features/auth/domain/usecases/user_logIn.dart';
 import 'package:caco_flutter_blog/features/auth/domain/usecases/user_signUp.dart';
 import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart';
@@ -20,30 +21,37 @@ Future<void> initDependencies() async {
 }
 
 void _initAuth() {
-  serviceLocator.registerFactory<AuthSupabaseSource>(
+  serviceLocator
+  ..registerFactory<AuthSupabaseSource>(
     () => AuthSupabaseSourceImpl(
       serviceLocator(),
-    )
-  );
-  serviceLocator.registerFactory<AuthRepository>(
+    ),
+  )
+  ..registerFactory<AuthRepository>(
     () => AuthRepositoryImpl(
       serviceLocator(),
-    )
-  );
-  serviceLocator.registerFactory(
+    ),
+  )
+  ..registerFactory(
     () => UserSignup(
       serviceLocator(),
-    )
-  );
-  serviceLocator.registerFactory(
+    ),
+  )
+  ..registerFactory(
     () => UserLogin(
       serviceLocator(),
-    )
-  );
-  serviceLocator.registerLazySingleton(
+    ),
+  )
+  ..registerFactory(
+    () => CurrentUser(
+      serviceLocator(),
+    ),
+  )
+  ..registerLazySingleton(
     () => AuthBloc(
       userSignUp: serviceLocator(),
       userLogIn: serviceLocator(),
-      ),
+      currentUser: serviceLocator(),
+    ),
   );
 }

@@ -6,13 +6,12 @@ class Loader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
+      heightFactor: 15,
         child: Image.asset(
           'lib/assets/cacodemon-spinning.gif',
           height: 50,
           width: 50,
           ),
-      ),
-    );
+      );
   }
 }

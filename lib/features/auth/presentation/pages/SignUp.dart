@@ -1,5 +1,4 @@
 import 'package:caco_flutter_blog/core/common/widgets/loader.dart';
-import 'package:caco_flutter_blog/core/theme/app_palette.dart';
 import 'package:caco_flutter_blog/core/utils/show_snackbar.dart';
 import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:caco_flutter_blog/features/auth/presentation/pages/Login.dart';

@@ -3,6 +3,7 @@ import 'package:caco_flutter_blog/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class AuthSupabaseSource {
+  Session? get currentSession;
   Future<UserModel> signUpWithEmailAndPassword({
     required String username,
     required String email,
@@ -12,11 +13,15 @@ abstract interface class AuthSupabaseSource {
     required String email,
     required String password,
   });
+  Future<UserModel?> getCurrentUser();
 }
 
 class AuthSupabaseSourceImpl implements AuthSupabaseSource {
   final SupabaseClient supabaseClient;
   AuthSupabaseSourceImpl(this.supabaseClient);
+
+  @override
+  Session? get currentSession => supabaseClient.auth.currentSession;
 
   @override
   Future<UserModel> signUpWithEmailAndPassword({
@@ -54,6 +59,21 @@ class AuthSupabaseSourceImpl implements AuthSupabaseSource {
         throw const ServerException('User does not exist!');
       }
       return UserModel.fromJson(response.user!.toJson());
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+  @override
+  Future<UserModel?> getCurrentUser() async {
+    try {
+      if (currentSession != null) {
+        final userData = await supabaseClient.from('profiles').select().eq(
+        'id', 
+        currentSession!.user.id
+        );
+        return UserModel.fromJson(userData.first);
+      }
+      return null;
     } catch (e) {
       throw ServerException(e.toString());
     }
