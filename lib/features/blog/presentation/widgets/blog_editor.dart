@@ -18,6 +18,12 @@ class BlogEditor extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       maxLines: null,
+      validator: (value) {
+        if (value!.trim().isEmpty) {
+          return 'This field is required!';
+        }
+        return null;
+      },
     );
   }
 }

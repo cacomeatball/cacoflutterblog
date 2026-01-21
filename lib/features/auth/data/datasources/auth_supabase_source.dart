@@ -15,6 +15,7 @@ abstract interface class AuthSupabaseSource {
     required String email,
     required String password,
   });
+  Future<UserModel?> signOut();
   Future<UserModel?> getCurrentUser();
 }
 
@@ -65,7 +66,10 @@ class AuthSupabaseSourceImpl implements AuthSupabaseSource {
       throw ServerException(e.toString());
     }
   }
-  
+  @override
+  Future<UserModel?> signOut() async {
+    await supabaseClient.auth.signOut();
+  }
   @override
   Future<UserModel?> getCurrentUser() async {
     try {
