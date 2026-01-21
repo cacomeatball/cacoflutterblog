@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:caco_flutter_blog/core/theme/app_palette.dart';
+import 'package:caco_flutter_blog/core/utils/pick_image.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/widgets/blog_editor.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +17,25 @@ class WriteNewBlog extends StatefulWidget {
 }
 
 class _WriteNewBlogState extends State<WriteNewBlog> {
+  final titleController = TextEditingController();
+  final contentController = TextEditingController();
+  File? image;
+
+  void selectImage() async {
+    final pickedImage = await pickImage();
+    if (pickedImage != null) {
+      setState(() {
+        image = pickedImage;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    contentController.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,38 +47,71 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
           ),
         ]
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            DottedBorder(
-              options: RectDottedBorderOptions(
-                color: AppPalette.primaryColor,
-                dashPattern: const [10, 4],
-                strokeCap: StrokeCap.round,
-              ),
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.folder_open,
-                      size: 40,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              image != null ?
+              GestureDetector(
+                onTap: selectImage,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      image!, 
+                      fit: BoxFit.cover,
                       ),
-                    SizedBox(height: 15),
-                    Text(
-                      'Upload Cover Image',
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
+                  ),
+                  ),
+              )
+              :
+              GestureDetector(
+                onTap: () {
+                  selectImage();
+                },
+                child: DottedBorder(
+                  options: RectDottedBorderOptions(
+                    color: AppPalette.primaryColor,
+                    dashPattern: const [10, 4],
+                    strokeCap: StrokeCap.round,
+                  ),
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.folder_open,
+                          size: 40,
+                          ),
+                        SizedBox(height: 15),
+                        Text(
+                          'Upload Cover Image',
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              BlogEditor(
+                controller: titleController, 
+                hintText: 'Enter your title here...',
+              ),
+              const SizedBox(height: 10),
+              BlogEditor(
+                controller: contentController, 
+                hintText: 'Enter your thoughts here...',
+              ),
+            ],
+          ),
         ),
       ),
     );
