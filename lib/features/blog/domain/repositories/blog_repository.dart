@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:caco_flutter_blog/core/error/failure.dart';
 import 'package:caco_flutter_blog/features/blog/domain/entities/blog.dart';
@@ -6,7 +6,7 @@ import 'package:fpdart/fpdart.dart';
 
 abstract interface class BlogRepository {
   Future<Either<Failure, Blog>> uploadBlog({
-    required File image,
+    required Uint8List imageBytes,
     required String title,
     required String content,
     required String user_id,
@@ -14,7 +14,7 @@ abstract interface class BlogRepository {
 
   Future<Either<Failure, Blog>> updateBlog({
     required String blogId,
-    required File image,
+    required Uint8List? imageBytes,
     required String title,
     required String content,
     required String user_id,

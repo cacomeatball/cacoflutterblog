@@ -21,9 +21,7 @@ class CommentAdd extends CommentEvent {
     this.username,
     this.image,
   });
-}
-
-class CommentDeleteEvent extends CommentEvent {
+}class CommentDeleteEvent extends CommentEvent {
   final String commentId;
   CommentDeleteEvent({required this.commentId});
 }

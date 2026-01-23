@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:caco_flutter_blog/core/common/widgets/loader.dart';
 import 'package:caco_flutter_blog/core/theme/app_palette.dart';
+import 'package:caco_flutter_blog/core/utils/image_display.dart';
 import 'package:caco_flutter_blog/core/utils/pick_image.dart';
 import 'package:caco_flutter_blog/core/utils/show_snackbar.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
@@ -11,6 +12,7 @@ import 'package:caco_flutter_blog/features/blog/presentation/widgets/blog_editor
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class WriteNewBlog extends StatefulWidget {
   static route() =>
@@ -25,7 +27,7 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  File? image;
+  XFile? image;
 
   void selectImage() async {
     final pickedImage = await pickImage();
@@ -104,9 +106,10 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
                             child: SizedBox(
                               width: double.infinity,
                               height: 150,
-                              child: ClipRRect(
+                              child: CrossPlatformImage(
+                                xfile: image,
+                                fit: BoxFit.cover,
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.file(image!, fit: BoxFit.cover),
                               ),
                             ),
                           )

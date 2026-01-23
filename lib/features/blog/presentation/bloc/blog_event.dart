@@ -8,7 +8,7 @@ final class BlogUpload extends BlogEvent {
   final String username;
   final String title;
   final String content;
-  final File image;
+  final XFile image;
 
   BlogUpload({
     required this.user_id, 
@@ -25,7 +25,7 @@ final class BlogUpdate extends BlogEvent {
   final String username;
   final String title;
   final String content;
-  final File image;
+  final XFile image;
 
   BlogUpdate({
     required this.blogId,

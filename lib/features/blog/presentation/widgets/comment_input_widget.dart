@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:caco_flutter_blog/core/utils/image_display.dart';
 import 'package:caco_flutter_blog/core/utils/show_snackbar.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class CommentInputWidget extends StatefulWidget {
 
 class _CommentInputWidgetState extends State<CommentInputWidget> {
   final TextEditingController _controller = TextEditingController();
-  File? _selectedImage;
+  XFile? _selectedImage;
 
   @override
   void dispose() {
@@ -32,7 +33,7 @@ class _CommentInputWidgetState extends State<CommentInputWidget> {
 
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImage = pickedFile;
       });
     }
   }
@@ -89,14 +90,12 @@ class _CommentInputWidgetState extends State<CommentInputWidget> {
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: Stack(
                       children: [
-                        ClipRRect(
+                        CrossPlatformImage(
+                          xfile: _selectedImage,
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImage!,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
                         ),
                         Positioned(
                           top: 8,
@@ -165,7 +164,9 @@ class _CommentInputWidgetState extends State<CommentInputWidget> {
                                       userId: userId,
                                       content: _controller.text.trim(),
                                       username: username,
-                                      image: _selectedImage,
+                                      image: _selectedImage != null 
+                                        ? File(_selectedImage!.path)
+                                        : null,
                                     ),
                                   );
                                 },

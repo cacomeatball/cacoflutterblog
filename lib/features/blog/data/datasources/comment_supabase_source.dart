@@ -72,9 +72,17 @@ class CommentSupabaseSourceImpl implements CommentSupabaseSource {
     required String commentId,
   }) async {
     try {
-      final imageBytes = await image.readAsBytes();
       final imagePath = 'comment_$commentId';
 
+      // Delete existing image if it exists
+      try {
+        await supabaseClient.storage.from('comment-images').remove([imagePath]);
+      } catch (e) {
+        // Image might not exist yet, continue
+      }
+
+      // Upload using uploadBinary for web compatibility
+      final imageBytes = await image.readAsBytes();
       await supabaseClient.storage
           .from('comment-images')
           .uploadBinary(imagePath, imageBytes);

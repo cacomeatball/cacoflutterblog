@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:caco_flutter_blog/core/error/failure.dart';
 import 'package:caco_flutter_blog/core/usecase/usecase.dart';
@@ -13,7 +13,7 @@ class UploadBlog implements UseCase<Blog, UploadBlogParams> {
   @override
   Future<Either<Failure, Blog>> call(UploadBlogParams params) async {
     return await blogRepository.uploadBlog(
-      image: params.image, 
+      imageBytes: params.imageBytes, 
       title: params.title, 
       content: params.content, 
       user_id: params.user_id, 
@@ -26,14 +26,14 @@ class UploadBlogParams {
   final String user_id;
   final String title;
   final String content;
-  final File image;
+  final Uint8List imageBytes;
 
 
   UploadBlogParams({
     required this.user_id, 
     required this.title,
     required this.content, 
-    required this.image, 
+    required this.imageBytes, 
 
   });
 }

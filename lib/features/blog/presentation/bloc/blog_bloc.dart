@@ -8,6 +8,7 @@ import 'package:caco_flutter_blog/features/blog/domain/usecases/update_blog.dart
 import 'package:caco_flutter_blog/features/blog/domain/usecases/upload_blog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 part 'blog_event.dart';
 part 'blog_state.dart';
 
@@ -37,11 +38,13 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     BlogUpload event, 
     Emitter<BlogState> emit
   ) async {
+    // Convert XFile to bytes
+    final imageBytes = await event.image.readAsBytes();
     final res = await _uploadBlog(UploadBlogParams(
       user_id: event.user_id, 
       title: event.title, 
       content: event.content, 
-      image: event.image, 
+      imageBytes: imageBytes, 
       ),
     );
     res.fold(
@@ -54,12 +57,14 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     BlogUpdate event, 
     Emitter<BlogState> emit
   ) async {
+    // Convert XFile to bytes
+    final imageBytes = await event.image.readAsBytes();
     final res = await _updateBlog(UpdateBlogParams(
       blogId: event.blogId,
       user_id: event.user_id, 
       title: event.title, 
       content: event.content, 
-      image: event.image, 
+      imageBytes: imageBytes, 
       ),
     );
     res.fold(

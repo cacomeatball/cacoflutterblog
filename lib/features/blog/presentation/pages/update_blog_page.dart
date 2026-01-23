@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:caco_flutter_blog/core/common/widgets/loader.dart';
 import 'package:caco_flutter_blog/core/theme/app_palette.dart';
+import 'package:caco_flutter_blog/core/utils/image_display.dart';
 import 'package:caco_flutter_blog/core/utils/pick_image.dart';
 import 'package:caco_flutter_blog/core/utils/show_snackbar.dart';
 import 'package:caco_flutter_blog/features/blog/domain/entities/blog.dart';
@@ -12,6 +13,7 @@ import 'package:caco_flutter_blog/features/blog/presentation/widgets/blog_editor
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UpdateBlogPage extends StatefulWidget {
   static route(Blog blog) =>
@@ -28,7 +30,7 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
   late TextEditingController titleController;
   late TextEditingController contentController;
   final formKey = GlobalKey<FormState>();
-  File? image;
+  XFile? image;
 
   @override
   void initState() {
@@ -56,16 +58,19 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
           (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       final userName =
           (context.read<AppUserCubit>().state as AppUserLoggedIn).user.username;
-      context.read<BlogBloc>().add(
-        BlogUpdate(
-          blogId: widget.blog.id,
-          user_id: userId,
-          title: titleController.text.trim(),
-          content: contentController.text.trim(),
-          image: image ?? File(''),
-          username: userName,
-        ),
-      );
+      
+      if (image != null) {
+        context.read<BlogBloc>().add(
+          BlogUpdate(
+            blogId: widget.blog.id,
+            user_id: userId,
+            title: titleController.text.trim(),
+            content: contentController.text.trim(),
+            image: image!,
+            username: userName,
+          ),
+        );
+      }
     }
   }
 
@@ -119,9 +124,10 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
                             child: SizedBox(
                               width: double.infinity,
                               height: 150,
-                              child: ClipRRect(
+                              child: CrossPlatformImage(
+                                xfile: image,
+                                fit: BoxFit.cover,
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.file(image!, fit: BoxFit.cover),
                               ),
                             ),
                           )

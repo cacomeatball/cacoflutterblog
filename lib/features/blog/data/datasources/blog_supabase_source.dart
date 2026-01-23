@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:caco_flutter_blog/core/error/exception.dart';
 import 'package:caco_flutter_blog/features/blog/data/models/blog_model.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogSupabaseSource {
@@ -9,6 +11,10 @@ abstract interface class BlogSupabaseSource {
   Future<BlogModel> updateBlog(BlogModel blog);
   Future<String> uploadBlogImage({
     required File image,
+    required BlogModel blog,
+  });
+  Future<String> uploadBlogImageBytes({
+    required Uint8List imageBytes,
     required BlogModel blog,
   });
   Future<List<BlogModel>> getAllBlogs();
@@ -57,10 +63,40 @@ class BlogSupabaseSourceImpl implements BlogSupabaseSource {
         // Image might not exist yet, continue
       }
       
-      // Upload new image
-      await supabaseClient.storage.from('blog-images').upload(
+      // Upload new image using uploadBinary for web compatibility
+      try {
+        final imageBytes = await image.readAsBytes();
+        await supabaseClient.storage.from('blog-images').uploadBinary(
+          blog.id,
+          imageBytes,
+        );
+      } catch (e) {
+        // If File.readAsBytes fails (common on web), try to get bytes directly
+        throw ServerException('Failed to read image bytes: $e');
+      }
+
+      return supabaseClient.storage.from('blog-images').getPublicUrl(blog.id);
+    } on StorageException catch (e) {
+      throw ServerException(e.message);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<String> uploadBlogImageBytes({required Uint8List imageBytes, required BlogModel blog}) async {
+    try {
+      // Delete existing image if it exists
+      try {
+        await supabaseClient.storage.from('blog-images').remove([blog.id]);
+      } catch (e) {
+        // Image might not exist yet, continue
+      }
+      
+      // Upload new image using uploadBinary
+      await supabaseClient.storage.from('blog-images').uploadBinary(
         blog.id,
-        image,
+        imageBytes,
       );
 
       return supabaseClient.storage.from('blog-images').getPublicUrl(blog.id);
