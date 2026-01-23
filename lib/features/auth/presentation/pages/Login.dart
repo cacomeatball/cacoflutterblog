@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Login extends StatefulWidget {
-  static route() => MaterialPageRoute(builder: (context) => const SignUp());
+  static route() => MaterialPageRoute(builder: (context) => const Login());
   const Login({super.key});
 
   @override
@@ -39,6 +39,12 @@ class _LoginState extends State<Login> {
             listener: (context, state) {
               if(state is AuthFailure){
                 showSnackBar(context, state.message);
+              } else if(state is AuthSuccess){
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  BlogPage.route(),
+                  (route) => false,
+                );
               }
             },
             builder: (context, state) {
@@ -84,7 +90,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(context, Login.route());
+                        Navigator.push(context, SignUp.route());
                       },
                       child: RichText(
                         text: TextSpan(

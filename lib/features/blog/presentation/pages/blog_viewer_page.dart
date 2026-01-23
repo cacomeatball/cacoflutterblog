@@ -6,9 +6,12 @@ import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart
 import 'package:caco_flutter_blog/features/blog/domain/entities/blog.dart';
 // removed unused import
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/pages/update_blog_page.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/pages/blog_page.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/widgets/alerts.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/widgets/comment_input_widget.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/widgets/comment_list_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +32,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(AuthIsUserLoggedIn());
+    context.read<CommentBloc>().add(CommentFetch(blogId: widget.blog.id));
   }
 
   void deleteBlog() {
@@ -143,6 +147,33 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                     Text(
                       widget.blog.content,
                       style: const TextStyle(fontSize: 16, height: 2),
+                    ),
+                    const Divider(height: 40),
+                    Text(
+                      'Comments',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    CommentInputWidget(blogId: widget.blog.id),
+                    const SizedBox(height: 20),
+                    BlocBuilder<CommentBloc, CommentState>(
+                      builder: (context, state) {
+                        if (state is CommentLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is CommentLoaded) {
+                          return CommentListWidget(comments: state.comments);
+                        } else if (state is CommentFailure) {
+                          return Center(
+                            child: Text(state.error),
+                          );
+                        }
+                        return CommentListWidget(comments: const []);
+                      },
                     ),
                   ],
                 ),

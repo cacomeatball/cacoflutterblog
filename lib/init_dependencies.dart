@@ -10,13 +10,20 @@ import 'package:caco_flutter_blog/features/auth/domain/usecases/user_signUp.dart
 import 'package:caco_flutter_blog/features/auth/domain/usecases/user_signOut.dart';
 import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/data/datasources/blog_supabase_source.dart';
+import 'package:caco_flutter_blog/features/blog/data/datasources/comment_supabase_source.dart';
 import 'package:caco_flutter_blog/features/blog/data/repositories/blog_repository_impl.dart';
+import 'package:caco_flutter_blog/features/blog/data/repositories/comment_repository_impl.dart';
 import 'package:caco_flutter_blog/features/blog/domain/repositories/blog_repository.dart';
+import 'package:caco_flutter_blog/features/blog/domain/repositories/comment_repository.dart';
+import 'package:caco_flutter_blog/features/blog/domain/usecases/add_comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/delete_blog.dart';
+import 'package:caco_flutter_blog/features/blog/domain/usecases/delete_comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/get_all_blogs.dart';
+import 'package:caco_flutter_blog/features/blog/domain/usecases/get_comments.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/update_blog.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/upload_blog.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -91,8 +98,19 @@ void _initBlog() {
       serviceLocator(),
     ),
   )
+  ..registerFactory<CommentSupabaseSource>(
+    () => CommentSupabaseSourceImpl(
+      serviceLocator(),
+    ),
+  )
   ..registerFactory<BlogRepository>(
     () => BlogRepositoryImpl(
+      serviceLocator(),
+    ),
+  )
+  ..registerFactory<CommentRepository>(
+    () => CommentRepositoryImpl(
+      serviceLocator(),
       serviceLocator(),
     ),
   )
@@ -116,12 +134,34 @@ void _initBlog() {
       serviceLocator(),
     )
   )
+  ..registerFactory(
+    () => AddComment(
+      serviceLocator(),
+    )
+  )
+  ..registerFactory(
+    () => GetComments(
+      serviceLocator(),
+    )
+  )
+  ..registerFactory(
+    () => DeleteComment(
+      serviceLocator(),
+    )
+  )
   ..registerLazySingleton(
     () => BlogBloc(
       uploadBlog: serviceLocator(),
       updateBlog: serviceLocator(), 
       getAllBlogs: serviceLocator(),
       deleteBlog: serviceLocator(),
+    ),
+  )
+  ..registerLazySingleton(
+    () => CommentBloc(
+      getComments: serviceLocator(),
+      addComment: serviceLocator(),
+      deleteComment: serviceLocator(),
     ),
   );
 }

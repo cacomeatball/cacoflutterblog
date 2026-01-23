@@ -49,7 +49,9 @@ class _BlogPageState extends State<BlogPage> {
                 confirmText: 'Log out',
               );
               if (!confirmed) return;
+              if (!context.mounted) return;
               context.read<AuthBloc>().add(AuthSignOut());
+              if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
                   context, 
                   Login.route(), 

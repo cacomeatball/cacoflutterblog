@@ -3,6 +3,7 @@ import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart
 import 'package:caco_flutter_blog/features/auth/presentation/pages/Login.dart';
 import 'package:caco_flutter_blog/core/theme/theme.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/pages/blog_page.dart';
 import 'package:caco_flutter_blog/init_dependencies.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ void main() async {
         ),
         BlocProvider(
           create: (_) => serviceLocator<BlogBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => serviceLocator<CommentBloc>(),
         ),
       ],
       child: const MainApp(),
