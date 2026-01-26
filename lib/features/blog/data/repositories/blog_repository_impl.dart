@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:caco_flutter_blog/core/error/exception.dart';
 import 'package:caco_flutter_blog/core/error/failure.dart';
@@ -14,7 +14,7 @@ class BlogRepositoryImpl implements BlogRepository {
   BlogRepositoryImpl(this.blogSupabaseSource);
   @override
   Future<Either<Failure, Blog>> uploadBlog({
-    required File image, 
+    required XFile image, 
     required String title, 
     required String content, 
     required String user_id,
@@ -44,19 +44,33 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  @override
   Future<Either<Failure, Blog>> updateBlog({
     required String blogId,
-    required File image, 
+    required XFile? image, 
     required String title, 
     required String content, 
     required String user_id,
     }) async {
       try {
-        var imageUrl = '';
+        // Fetch the existing blog to preserve data if not being updated
+        final existingBlogs = await blogSupabaseSource.getAllBlogs();
+        final existingBlog = existingBlogs.firstWhere(
+          (blog) => blog.id == blogId,
+          orElse: () => BlogModel(
+            id: blogId,
+            user_id: user_id,
+            title: title,
+            content: content,
+            image_url: '',
+            username: '',
+            created_at: DateTime.now(),
+          ),
+        );
+        
+        var imageUrl = existingBlog.image_url; // Preserve existing image URL by default
         
         // Only upload new image if provided
-        if (image.path.isNotEmpty) {
+        if (image != null) {
           imageUrl = await blogSupabaseSource.uploadBlogImage(
             image: image,
             blog: BlogModel(
@@ -66,7 +80,7 @@ class BlogRepositoryImpl implements BlogRepository {
               content: content,
               image_url: '',
               username: '',
-              created_at: DateTime.now(),
+              created_at: existingBlog.created_at,
             ),
           );
         }
@@ -76,9 +90,9 @@ class BlogRepositoryImpl implements BlogRepository {
           user_id: user_id, 
           title: title, 
           content: content,
-          image_url: imageUrl.isNotEmpty ? imageUrl : '', 
-          username: '',
-          created_at: DateTime.now(),  
+          image_url: imageUrl, 
+          username: existingBlog.username,
+          created_at: existingBlog.created_at,  
         );
         final updatedBlog = await blogSupabaseSource.updateBlog(blogModel);
         return Right(updatedBlog);

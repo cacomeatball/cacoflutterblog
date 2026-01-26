@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:caco_flutter_blog/core/error/failure.dart';
 import 'package:caco_flutter_blog/core/usecase/usecase.dart';
@@ -28,7 +28,7 @@ class UpdateBlogParams {
   final String user_id;
   final String title;
   final String content;
-  final File image;
+  final XFile? image;
 
 
   UpdateBlogParams({

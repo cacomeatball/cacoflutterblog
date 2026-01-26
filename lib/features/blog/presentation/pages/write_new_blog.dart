@@ -1,4 +1,6 @@
-import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:image_picker/image_picker.dart';
 
 import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:caco_flutter_blog/core/common/widgets/loader.dart';
@@ -25,7 +27,7 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  File? image;
+  XFile? image;
 
   void selectImage() async {
     final pickedImage = await pickImage();
@@ -106,7 +108,15 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
                               height: 150,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.file(image!, fit: BoxFit.cover),
+                                child: FutureBuilder<List<int>>(
+                                  future: image!.readAsBytes(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Image.memory(Uint8List.fromList(snapshot.data!), fit: BoxFit.cover);
+                                    }
+                                    return const Center(child: CircularProgressIndicator());
+                                  },
+                                ),
                               ),
                             ),
                           )

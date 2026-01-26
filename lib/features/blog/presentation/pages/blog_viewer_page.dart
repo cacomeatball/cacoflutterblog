@@ -4,15 +4,11 @@ import 'package:caco_flutter_blog/core/utils/format_date.dart';
 import 'package:caco_flutter_blog/core/utils/show_snackbar.dart';
 import 'package:caco_flutter_blog/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/domain/entities/blog.dart';
-// removed unused import
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
-import 'package:caco_flutter_blog/features/blog/presentation/pages/update_blog_page.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/pages/blog_page.dart';
-import 'package:caco_flutter_blog/features/blog/presentation/widgets/alerts.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/widgets/comment_input_widget.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/widgets/comment_list_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -33,10 +29,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     super.initState();
     context.read<AuthBloc>().add(AuthIsUserLoggedIn());
     context.read<CommentBloc>().add(CommentFetch(blogId: widget.blog.id));
-  }
-
-  void deleteBlog() {
-    context.read<BlogBloc>().add(BlogDelete(widget.blog.id));
   }
 
   @override
@@ -62,51 +54,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         },
         builder: (context, state) {
           return Scaffold(
-          appBar: AppBar(
-            actions: [
-              BlocSelector<AppUserCubit, AppUserState, bool>(
-                selector: (userState) {
-                  if (userState is AppUserLoggedIn) {
-                    return userState.user.id == widget.blog.user_id;
-                  }
-                  return false;
-                },
-                builder: (context, isAuthor) {
-                  if (!isAuthor) return const SizedBox.shrink();
-                return IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    final confirmed = await showConfirmDialog(
-                    context: context,
-                    title: 'Delete Post',
-                    content: 'Are you sure?\nThis action cannot be undone!',
-                    confirmText: 'Delete',
-                  );
-                    if (!confirmed) return;
-                    deleteBlog();
-                    },
-                  );
-                },
-              ),
-              BlocSelector<AppUserCubit, AppUserState, bool>(
-                selector: (userState) {
-                  if (userState is AppUserLoggedIn) {
-                    return userState.user.id == widget.blog.user_id;
-                  }
-                  return false;
-                },
-                builder: (context, isAuthor) {
-                  if (!isAuthor) return const SizedBox.shrink();
-                return IconButton(
-                  onPressed: () {
-                      Navigator.push(context, UpdateBlogPage.route(widget.blog));
-                    }, 
-                  icon: const Icon(CupertinoIcons.add_circled),
-                  );
-                },
-              ),
-            ],
-          ),
+          appBar: AppBar(),
           body: Scrollbar(
             child: SingleChildScrollView(
               child: Padding(

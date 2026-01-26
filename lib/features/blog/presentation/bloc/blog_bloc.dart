@@ -8,6 +8,7 @@ import 'package:caco_flutter_blog/features/blog/domain/usecases/update_blog.dart
 import 'package:caco_flutter_blog/features/blog/domain/usecases/upload_blog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 part 'blog_event.dart';
 part 'blog_state.dart';
 

@@ -1,4 +1,6 @@
-import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:image_picker/image_picker.dart';
 
 import 'package:caco_flutter_blog/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:caco_flutter_blog/core/common/widgets/loader.dart';
@@ -28,7 +30,7 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
   late TextEditingController titleController;
   late TextEditingController contentController;
   final formKey = GlobalKey<FormState>();
-  File? image;
+  XFile? image;
 
   @override
   void initState() {
@@ -62,7 +64,7 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
           user_id: userId,
           title: titleController.text.trim(),
           content: contentController.text.trim(),
-          image: image ?? File(''),
+          image: image,
           username: userName,
         ),
       );
@@ -93,12 +95,9 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
         listener: (context, state) {
           if (state is BlogFailure) {
             showSnackBar(context, state.error);
-          } else if (state is BlogUpdateSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context, 
-              BlogPage.route(), 
-              (route) => false,
-              );
+          } else if (state is BlogUploadSuccess) {
+            showSnackBar(context, 'Blog updated!');
+            Navigator.pop(context);
           }
         },
         builder: (context, state) {
@@ -121,7 +120,15 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
                               height: 150,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.file(image!, fit: BoxFit.cover),
+                                child: FutureBuilder<List<int>>(
+                                  future: image!.readAsBytes(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Image.memory(Uint8List.fromList(snapshot.data!), fit: BoxFit.cover);
+                                    }
+                                    return const Center(child: CircularProgressIndicator());
+                                  },
+                                ),
                               ),
                             ),
                           )

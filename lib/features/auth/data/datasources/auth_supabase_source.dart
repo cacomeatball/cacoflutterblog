@@ -41,6 +41,19 @@ class AuthSupabaseSourceImpl implements AuthSupabaseSource {
       if (response.user == null) {
         throw const ServerException('Failed to sign up user');
       }
+      
+      // Create user profile in profiles table
+      try {
+        await supabaseClient.from('profiles').insert({
+          'id': response.user!.id,
+          'username': username,
+          'email': email,
+        });
+      } catch (e) {
+        // Profile might already exist or table might not exist
+        // Continue with signup process
+      }
+      
       return UserModel.fromJson(response.user!.toJson());
     } on AuthException catch (e) {
       throw ServerException(e.message);
