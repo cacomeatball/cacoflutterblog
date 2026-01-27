@@ -87,10 +87,31 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(widget.blog.image_url),
-                    ),
+                    if (widget.blog.image_url.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          widget.blog.image_url,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  size: 64,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     Text(
                       widget.blog.content,
@@ -118,6 +139,10 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                         } else if (state is CommentFailure) {
                           return Center(
                             child: Text(state.error),
+                          );
+                        } else if (state is CommentEdited || state is CommentAdded || state is CommentDeleted) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
                         }
                         return CommentListWidget(comments: const []);

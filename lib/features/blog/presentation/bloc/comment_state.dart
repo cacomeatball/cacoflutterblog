@@ -18,6 +18,11 @@ class CommentAdded extends CommentState {
 
 class CommentDeleted extends CommentState {}
 
+class CommentEdited extends CommentState {
+  final Comment comment;
+  CommentEdited(this.comment);
+}
+
 class CommentFailure extends CommentState {
   final String error;
   CommentFailure(this.error);

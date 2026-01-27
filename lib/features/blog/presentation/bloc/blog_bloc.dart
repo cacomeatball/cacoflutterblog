@@ -59,7 +59,8 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       user_id: event.user_id, 
       title: event.title, 
       content: event.content, 
-      image: event.image, 
+      image: event.image,
+      removeImage: event.removeImage, 
       ),
     );
     res.fold(

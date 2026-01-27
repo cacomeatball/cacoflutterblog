@@ -8,9 +8,15 @@ abstract interface class CommentSupabaseSource {
   Future<CommentModel> addComment(CommentModel comment);
   Future<List<CommentModel>> getCommentsByBlogId(String blogId);
   Future<void> deleteComment(String commentId);
-  Future<String> uploadCommentImage({
-    required XFile image,
+  Future<String?> uploadCommentImage({
+    XFile? image,
     required String commentId,
+  });
+  Future<CommentModel> updateComment({
+    required String commentId,
+    required String content,
+    String? imageUrl,
+    bool removeImage = false,
   });
 }
 
@@ -67,15 +73,17 @@ class CommentSupabaseSourceImpl implements CommentSupabaseSource {
   }
 
   @override
-  Future<String> uploadCommentImage({
-    required XFile image,
+  Future<String?> uploadCommentImage({
+    XFile? image,
     required String commentId,
   }) async {
     try {
-      final imageBytes = await image.readAsBytes();
-      if (imageBytes.isEmpty) {
-        throw ServerException('Image file is empty');
+      // Return null if no image is provided
+      if (image == null) {
+        return null;
       }
+      
+      final imageBytes = await image.readAsBytes();
       
       // Create a unique filename to avoid conflicts and enable upsert
       final filename = 'comment_${commentId}_${DateTime.now().millisecondsSinceEpoch}';
@@ -97,6 +105,34 @@ class CommentSupabaseSourceImpl implements CommentSupabaseSource {
       throw ServerException('Storage error: ${e.message}');
     } catch (e) {
       throw ServerException('Image upload failed: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<CommentModel> updateComment({
+    required String commentId,
+    required String content,
+    String? imageUrl,
+    bool removeImage = false,
+  }) async {
+    try {
+      final updateData = {
+        'content': content,
+        if (imageUrl != null) 'image_url': imageUrl,
+        if (removeImage) 'image_url': null,
+      };
+
+      final commentData = await supabaseClient
+          .from('comments')
+          .update(updateData)
+          .eq('id', commentId)
+          .select();
+
+      return CommentModel.fromJson(commentData.first);
+    } on PostgrestException catch (e) {
+      throw ServerException(e.message);
+    } catch (e) {
+      throw ServerException(e.toString());
     }
   }
 }

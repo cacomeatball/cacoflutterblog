@@ -2,6 +2,7 @@ import 'package:caco_flutter_blog/features/blog/domain/entities/comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/add_comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/delete_comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/get_comments.dart';
+import 'package:caco_flutter_blog/features/blog/domain/usecases/update_comment.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,18 +13,22 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
   final GetComments _getComments;
   final AddComment _addComment;
   final DeleteComment _deleteComment;
+  final UpdateComment _updateComment;
 
   CommentBloc({
     required GetComments getComments,
     required AddComment addComment,
     required DeleteComment deleteComment,
+    required UpdateComment updateComment,
   })  : _getComments = getComments,
         _addComment = addComment,
         _deleteComment = deleteComment,
+        _updateComment = updateComment,
         super(CommentInitial()) {
     on<CommentFetch>(_onFetchComments);
     on<CommentAdd>(_onAddComment);
     on<CommentDeleteEvent>(_onDeleteComment);
+    on<CommentEditEvent>(_onEditComment);
   }
 
   Future<void> _onFetchComments(
@@ -69,6 +74,25 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
     res.fold(
       (failure) => emit(CommentFailure(failure.message)),
       (_) => emit(CommentDeleted()),
+    );
+  }
+
+  Future<void> _onEditComment(
+    CommentEditEvent event,
+    Emitter<CommentState> emit,
+  ) async {
+    emit(CommentLoading());
+    final res = await _updateComment(
+      UpdateCommentParams(
+        commentId: event.commentId,
+        content: event.content,
+        image: event.image,
+        removeImage: event.removeImage,
+      ),
+    );
+    res.fold(
+      (failure) => emit(CommentFailure(failure.message)),
+      (comment) => emit(CommentEdited(comment)),
     );
   }
 }

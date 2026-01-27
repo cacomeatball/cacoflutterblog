@@ -17,7 +17,8 @@ class UpdateBlog implements UseCase<Blog, UpdateBlogParams> {
       image: params.image, 
       title: params.title, 
       content: params.content, 
-      user_id: params.user_id, 
+      user_id: params.user_id,
+      removeImage: params.removeImage, 
     );
   }
 
@@ -29,6 +30,7 @@ class UpdateBlogParams {
   final String title;
   final String content;
   final XFile? image;
+  final bool removeImage;
 
 
   UpdateBlogParams({
@@ -37,6 +39,7 @@ class UpdateBlogParams {
     required this.title,
     required this.content, 
     required this.image, 
+    this.removeImage = false,
 
   });
 }

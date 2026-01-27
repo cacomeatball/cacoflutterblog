@@ -26,14 +26,14 @@ class UploadBlogParams {
   final String user_id;
   final String title;
   final String content;
-  final XFile image;
+  final XFile? image;
 
 
   UploadBlogParams({
     required this.user_id, 
     required this.title,
     required this.content, 
-    required this.image, 
+    this.image, 
 
   });
 }

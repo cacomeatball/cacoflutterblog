@@ -27,3 +27,17 @@ class CommentDeleteEvent extends CommentEvent {
   final String commentId;
   CommentDeleteEvent({required this.commentId});
 }
+
+class CommentEditEvent extends CommentEvent {
+  final String commentId;
+  final String content;
+  final XFile? image;
+  final bool removeImage;
+
+  CommentEditEvent({
+    required this.commentId,
+    required this.content,
+    this.image,
+    this.removeImage = false,
+  });
+}

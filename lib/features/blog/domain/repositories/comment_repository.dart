@@ -15,4 +15,11 @@ abstract interface class CommentRepository {
   Future<Either<Failure, List<Comment>>> getCommentsByBlogId(String blogId);
 
   Future<Either<Failure, void>> deleteComment(String commentId);
+
+  Future<Either<Failure, Comment>> updateComment({
+    required String commentId,
+    required String content,
+    XFile? image,
+    bool removeImage = false,
+  });
 }

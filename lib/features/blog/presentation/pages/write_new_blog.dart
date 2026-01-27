@@ -39,7 +39,7 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
   }
 
   void uploadBlog() {
-    if (formKey.currentState!.validate() && image != null) {
+    if (formKey.currentState!.validate()) {
       final userId =
           (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       final userName =
@@ -49,7 +49,7 @@ class _WriteNewBlogState extends State<WriteNewBlog> {
           user_id: userId,
           title: titleController.text.trim(),
           content: contentController.text.trim(),
-          image: image!,
+          image: image,
           username: userName,
         ),
       );

@@ -91,4 +91,41 @@ class CommentRepositoryImpl implements CommentRepository {
       return left(Failure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, Comment>> updateComment({
+    required String commentId,
+    required String content,
+    XFile? image,
+    bool removeImage = false,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return left(
+          Failure('No internet connection'),
+        );
+      }
+
+      String? imageUrl;
+
+      // Upload image if provided
+      if (image != null) {
+        imageUrl =
+            await commentSupabaseSource.uploadCommentImage(
+          image: image,
+          commentId: commentId,
+        );
+      }
+
+      final comment = await commentSupabaseSource.updateComment(
+        commentId: commentId,
+        content: content,
+        imageUrl: imageUrl,
+        removeImage: removeImage,
+      );
+      return right(comment);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    }
+  }
 }

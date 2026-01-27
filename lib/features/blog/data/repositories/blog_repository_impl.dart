@@ -14,27 +14,40 @@ class BlogRepositoryImpl implements BlogRepository {
   BlogRepositoryImpl(this.blogSupabaseSource);
   @override
   Future<Either<Failure, Blog>> uploadBlog({
-    required XFile image, 
+    required XFile? image, 
     required String title, 
     required String content, 
     required String user_id,
     }) async {
       try {
+        var imageUrl = '';
+        
+        // Only upload image if provided
+        if (image != null) {
+          BlogModel tempBlogModel = BlogModel(
+            id: const Uuid().v1(), 
+            user_id: user_id, 
+            title: title, 
+            content: content,
+            image_url: '', 
+            username: '',
+            created_at: DateTime.now(),  
+          );
+          final uploadedImageUrl = await blogSupabaseSource.uploadBlogImage(
+            image: image, 
+            blog: tempBlogModel
+          );
+          imageUrl = uploadedImageUrl ?? '';
+        }
+        
         BlogModel blogModel = BlogModel(
           id: const Uuid().v1(), 
           user_id: user_id, 
           title: title, 
           content: content,
-          image_url: '', 
+          image_url: imageUrl, 
           username: '',
           created_at: DateTime.now(),  
-        );
-        final imageUrl = await blogSupabaseSource.uploadBlogImage(
-          image: image, 
-          blog: blogModel
-        );
-        blogModel = blogModel.copyWith(
-          image_url: imageUrl,
         );
         final uploadedBlog = await blogSupabaseSource.uploadBlog(blogModel);
         return Right(uploadedBlog);
@@ -50,6 +63,7 @@ class BlogRepositoryImpl implements BlogRepository {
     required String title, 
     required String content, 
     required String user_id,
+    required bool removeImage,
     }) async {
       try {
         // Fetch the existing blog to preserve data if not being updated
@@ -69,9 +83,13 @@ class BlogRepositoryImpl implements BlogRepository {
         
         var imageUrl = existingBlog.image_url; // Preserve existing image URL by default
         
+        // Handle image removal
+        if (removeImage) {
+          imageUrl = '';
+        }
         // Only upload new image if provided
-        if (image != null) {
-          imageUrl = await blogSupabaseSource.uploadBlogImage(
+        else if (image != null) {
+          final uploadedUrl = await blogSupabaseSource.uploadBlogImage(
             image: image,
             blog: BlogModel(
               id: blogId,
@@ -83,6 +101,7 @@ class BlogRepositoryImpl implements BlogRepository {
               created_at: existingBlog.created_at,
             ),
           );
+          imageUrl = uploadedUrl ?? existingBlog.image_url;
         }
         
         BlogModel blogModel = BlogModel(

@@ -57,6 +57,11 @@ class _CommentInputWidgetState extends State<CommentInputWidget> {
           context.read<CommentBloc>().add(
             CommentFetch(blogId: widget.blogId),
           );
+        } else if (state is CommentEdited) {
+          showSnackBar(context, 'Comment edited!');
+          context.read<CommentBloc>().add(
+            CommentFetch(blogId: widget.blogId),
+          );
         }
       },
       child: BlocSelector<AppUserCubit, AppUserState, (String?, String?)>(

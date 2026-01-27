@@ -31,6 +31,7 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
   late TextEditingController contentController;
   final formKey = GlobalKey<FormState>();
   XFile? image;
+  bool removeImage = false;
 
   @override
   void initState() {
@@ -44,16 +45,13 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
     if (pickedImage != null) {
       setState(() {
         image = pickedImage;
+        removeImage = false; // Clear remove flag when selecting new image
       });
     }
   }
 
   void updateBlog() {
     if (formKey.currentState!.validate()) {
-      if (image == null && widget.blog.image_url.isEmpty) {
-        showSnackBar(context, 'Please select an image');
-        return;
-      }
       final userId =
           (context.read<AppUserCubit>().state as AppUserLoggedIn).user.id;
       final userName =
@@ -66,6 +64,7 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
           content: contentController.text.trim(),
           image: image,
           username: userName,
+          removeImage: removeImage,
         ),
       );
     }
@@ -112,27 +111,91 @@ class _UpdateBlogState extends State<UpdateBlogPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    image != null
-                        ? GestureDetector(
+                    // Display new selected image
+                    if (image != null && !removeImage)
+                        GestureDetector(
                             onTap: selectImage,
                             child: SizedBox(
                               width: double.infinity,
                               height: 150,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: FutureBuilder<List<int>>(
-                                  future: image!.readAsBytes(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Image.memory(Uint8List.fromList(snapshot.data!), fit: BoxFit.cover);
-                                    }
-                                    return const Center(child: CircularProgressIndicator());
-                                  },
-                                ),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: FutureBuilder<List<int>>(
+                                      future: image!.readAsBytes(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          return Image.memory(Uint8List.fromList(snapshot.data!), fit: BoxFit.cover);
+                                        }
+                                        return const Center(child: CircularProgressIndicator());
+                                      },
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.red,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close, color: Colors.white),
+                                        onPressed: () {
+                                          setState(() {
+                                            image = null;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           )
-                        : GestureDetector(
+                    // Display existing blog image with delete option
+                    else if (widget.blog.image_url.isNotEmpty && !removeImage)
+                        GestureDetector(
+                            onTap: selectImage,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 150,
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      widget.blog.image_url,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.image_not_supported),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.red,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.white),
+                                        onPressed: () {
+                                          setState(() {
+                                            removeImage = true;
+                                            image = null;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                    // Show upload prompt
+                    else
+                        GestureDetector(
                             onTap: () {
                               selectImage();
                             },

@@ -7,8 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract interface class BlogSupabaseSource {
   Future<BlogModel> uploadBlog(BlogModel blog);
   Future<BlogModel> updateBlog(BlogModel blog);
-  Future<String> uploadBlogImage({
-    required XFile image,
+  Future<String?> uploadBlogImage({
+    required XFile? image,
     required BlogModel blog,
   });
   Future<List<BlogModel>> getAllBlogs();
@@ -80,8 +80,13 @@ class BlogSupabaseSourceImpl implements BlogSupabaseSource {
   }
   
   @override
-  Future<String> uploadBlogImage({required XFile image, required BlogModel blog}) async {
+  Future<String?> uploadBlogImage({required XFile? image, required BlogModel blog}) async {
     try {
+      // Return null if no image is provided
+      if (image == null) {
+        return null;
+      }
+      
       final bytes = await image.readAsBytes();
       if (bytes.isEmpty) {
         throw ServerException('Image file is empty');

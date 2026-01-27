@@ -21,6 +21,7 @@ import 'package:caco_flutter_blog/features/blog/domain/usecases/delete_comment.d
 import 'package:caco_flutter_blog/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/get_comments.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/update_blog.dart';
+import 'package:caco_flutter_blog/features/blog/domain/usecases/update_comment.dart';
 import 'package:caco_flutter_blog/features/blog/domain/usecases/upload_blog.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:caco_flutter_blog/features/blog/presentation/bloc/comment_bloc.dart';
@@ -149,6 +150,11 @@ void _initBlog() {
       serviceLocator(),
     )
   )
+  ..registerFactory(
+    () => UpdateComment(
+      serviceLocator(),
+    )
+  )
   ..registerLazySingleton(
     () => BlogBloc(
       uploadBlog: serviceLocator(),
@@ -162,6 +168,7 @@ void _initBlog() {
       getComments: serviceLocator(),
       addComment: serviceLocator(),
       deleteComment: serviceLocator(),
+      updateComment: serviceLocator(),
     ),
   );
 }
